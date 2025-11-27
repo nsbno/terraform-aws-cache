@@ -3,7 +3,7 @@
 :!toc-placement:
 :toc:
 
-Setup a cache using AWS Elasticache. Valkey is the default engine, which is a drop-in replacement for Redis >= 7.2.
+Setup a cache using AWS Elasticache. Valkey is the default engine, which is a drop-in replacement for Redis `>= 7.2`.
 Read more https://aws.amazon.com/elasticache/what-is-valkey/[about valkey here].
 
 This module is an upgrade from the previous https://github.com/nsbno/terraform-aws-redis[`terraform-aws-redis` module].
@@ -16,7 +16,7 @@ Remember to check out the link:variables.tf[*variables*] and link:outputs.tf[*ou
 
 [source,hcl]
 ----
-module "elasticache" {
+module "cache" {
   source = "github.com/nsbno/terraform-aws-cache?ref=x.y.z"
 
   service_name       = "my-cool-train-status-thingy"
@@ -24,6 +24,67 @@ module "elasticache" {
 
   vpc_id     = data.aws_vpc.main.id
   subnet_ids = data.aws_subnet_ids.private.ids
+}
+----
+
+== Upgrading from `terraform-aws-redis`
+Remove the old module:
+[source,hcl]
+----
+module "elasticache" {
+  source = "github.com/nsbno/terraform-aws-redis?ref=x.y.z"
+
+  application_name   = "my-cool-train-status-thingy"
+  security_group_ids = [aws_security_group.this.id]
+
+  vpc_id     = data.aws_vpc.main.id
+  subnet_ids = data.aws_subnet_ids.private.ids
+}
+----
+
+And then add the new one including moved statements.
+The moved statements can be deleted after apply.
+
+[WARNING]
+The change from Redis to Valkey will not be applied immediately. Any new Terraform run will not show any
+changes being made.
+
+[NOTE]
+Make sure the module names match in the moved blocks. There should be no created or destroyed resources after
+applying. Add any missing moved blocks if needed.
+
+
+[source,hcl]
+----
+module "cache" {
+  source = "github.com/nsbno/terraform-aws-cache?ref=x.y.z"
+
+  service_name       = "my-cool-train-status-thingy"
+  security_group_ids = [aws_security_group.this.id]
+
+  vpc_id     = data.aws_vpc.main.id
+  subnet_ids = data.aws_subnet_ids.private.ids
+}
+
+moved {
+  from = module.elasticache.aws_elasticache_replication_group.this
+  to   = module.cache.aws_elasticache_replication_group.this
+}
+moved {
+  from = module.elasticache.aws_elasticache_subnet_group.this
+  to   = module.cache.aws_elasticache_subnet_group.this
+}
+moved {
+  from = module.elasticache.aws_security_group.this
+  to   = module.cache.aws_security_group.this
+}
+moved {
+  from = module.elasticache.aws_security_group_rule.egress_from_application_to_elasticache[0]
+  to   = module.cache.aws_security_group_rule.egress_from_application_to_elasticache[0]
+}
+moved {
+  from = module.elasticache.aws_security_group_rule.ingress_from_application_to_elasticache[0]
+  to   = module.cache.aws_security_group_rule.ingress_from_application_to_elasticache[0]
 }
 ----
 
