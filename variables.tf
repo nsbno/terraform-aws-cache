@@ -48,14 +48,14 @@ variable "engine_version" {
   description = "The version of redis to use"
   type        = string
 
-  default = "7.2"
+  default = "8.2"
 }
 
 variable "parameter_group_name" {
   description = "Parameter group to use for the engine"
   type        = string
 
-  default = "default.valkey7"
+  default = "default.valkey8"
 }
 
 variable "user_group_ids" {
