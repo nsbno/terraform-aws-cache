@@ -1,0 +1,72 @@
+variable "service_name" {
+  description = "Name of the service that is using this elasticache"
+  type        = string
+}
+
+variable "engine" {
+  description = "The caching engine to use. Valid values are 'redis' or 'valkey'"
+  type        = string
+
+  default = "valkey"
+
+  validation {
+    condition     = var.engine == "redis" || var.engine == "valkey"
+    error_message = "Engine must be either 'redis' or 'valkey'."
+  }
+}
+
+variable "security_group_ids" {
+  description = "Security Groups that are allowed to access the cluster"
+  type        = list(string)
+}
+
+variable "vpc_id" {
+  description = "The ID of the VPC the ElastiCache cluster will be in"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "Subnets where the elasticache will be placed"
+  type        = list(string)
+}
+
+variable "node_type" {
+  description = "Instance type for the nodes"
+  type        = string
+
+  default = "cache.t4g.small"
+}
+
+variable "availability_zones" {
+  description = "Availability zones to run in"
+  type        = list(string)
+
+  default = []
+}
+
+variable "engine_version" {
+  description = "The version of redis to use"
+  type        = string
+
+  default = "7.2"
+}
+
+variable "parameter_group_name" {
+  description = "Parameter group to use for the engine"
+  type        = string
+
+  default = "default.valkey7"
+}
+
+variable "user_group_ids" {
+  description = "User Group ID to associate with the replication group (Optional)"
+  type        = list(string)
+
+  default = null
+}
+
+variable "apply_immediately" {
+  description = "Apply changes immediately. Set to true when changing any attributes. Can cause downtime."
+  type        = bool
+  default     = false
+}

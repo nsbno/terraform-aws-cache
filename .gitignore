@@ -1,0 +1,8 @@
+# IntelliJ
+.idea/
+.editorconfig
+*.iml
+
+# Terraform
+.terraform/
+*.tfstate
