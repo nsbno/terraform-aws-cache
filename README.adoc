@@ -46,8 +46,10 @@ And then add the new one including moved statements.
 The moved statements can be deleted after apply.
 
 [WARNING]
-The change from Redis to Valkey will not be applied immediately. Any new Terraform run will not show any
-changes being made.
+The change from Redis to Valkey will not be applied immediately. +
+Any new Terraform run will not show any
+changes being made. +
+Alternatively, you can use `apply_immediate_changes = true` to apply the changes immediately.
 
 [NOTE]
 Make sure the module names match in the moved blocks. There should be no created or destroyed resources after
@@ -64,6 +66,9 @@ module "cache" {
 
   vpc_id     = data.aws_vpc.main.id
   subnet_ids = data.aws_subnet_ids.private.ids
+
+  # Optional: Uncomment to apply changes immediately, else changes will be applied during the next maintenance window.
+  # apply_immediate_changes = true
 }
 
 moved {
